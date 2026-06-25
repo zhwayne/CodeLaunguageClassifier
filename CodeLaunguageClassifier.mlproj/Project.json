@@ -1,0 +1,29 @@
+{
+  "activityEntities" : [
+    "projectCreated",
+    [
+      {
+        "createdDate" : "2026-06-25T06:00:13Z",
+        "event" : "projectCreated",
+        "id" : "5FE8E1B9-DC08-417F-AE5B-5EAA4D0B76B7",
+        "subtitle" : "CodeLaunguageClassifier",
+        "title" : "Project Created"
+      }
+    ]
+  ],
+  "authorName" : "zhwayne",
+  "createdDate" : "2026-06-25T06:00:13Z",
+  "description" : "主流编程语言分类模型",
+  "id" : "A12CD1D5-C5B6-4572-B5B9-203E4AF21B90",
+  "license" : "",
+  "location" : "",
+  "modifiedDate" : "2026-06-25T06:00:13Z",
+  "projectName" : "CodeLaunguageClassifier",
+  "settingsEntity" : {
+    "snapshotOnExtendTraining" : true,
+    "snapshotOnResumeTraining" : false
+  },
+  "taskType" : "textClassifier",
+  "title" : "Text Classification",
+  "version" : "1.1"
+}

@@ -1,0 +1,91 @@
+{
+  "activityEntities" : [
+    "dataSourceCreated",
+    [
+      {
+        "createdDate" : "2026-06-25T06:08:43Z",
+        "event" : "dataSourceCreated",
+        "id" : "04F9D91F-1555-413E-A798-448F668FD0FB",
+        "subtitle" : "val_create_ml.csv",
+        "title" : "Data Source Created"
+      }
+    ]
+  ],
+  "createdDate" : "2026-06-25T06:08:43Z",
+  "dataPathRelativeToProjectURL" : "../CodeTextClassifier/data/val_create_ml.csv/",
+  "dataResult" : {
+    "classesCount" : 23,
+    "createdDate" : "2026-06-25T06:08:43Z",
+    "dataAnalysis" : {
+      "classifierAnalysis" : {
+        "labelStats" : {
+          "C" : 5349,
+          "C#" : 5177,
+          "C++" : 4121,
+          "CSS" : 2814,
+          "Dart" : 6397,
+          "Go" : 5934,
+          "HTML" : 5146,
+          "JSON" : 5106,
+          "Java" : 4362,
+          "JavaScript" : 4671,
+          "Kotlin" : 4621,
+          "Lua" : 6308,
+          "Objective-C" : 4953,
+          "PHP" : 4561,
+          "Python" : 4173,
+          "Ruby" : 5350,
+          "Rust" : 5637,
+          "SQL" : 2350,
+          "Shell" : 4357,
+          "Swift" : 5653,
+          "TypeScript" : 4838,
+          "XML" : 4856,
+          "YAML" : 4826
+        }
+      },
+      "issues" : [
+        {
+          "description" : "23 classes found, including Dart, Lua, Go",
+          "severity" : "debug"
+        },
+        {
+          "description" : "111560 texts found, automatically creating validation set",
+          "severity" : "good"
+        },
+        {
+          "description" : "Smallest class is \"SQL\" with 2350 texts",
+          "severity" : "debug"
+        },
+        {
+          "description" : "Largest class is \"Dart\" with 6397 text",
+          "severity" : "debug"
+        }
+      ],
+      "objectDetectorAnalysis" : {
+        "details" : {
+
+        }
+      },
+      "summary" : {
+        "canUseValidation" : 1,
+        "classCount" : 23,
+        "sampleCount" : 111560
+      }
+    },
+    "dataSourceID" : "304F361C-734B-4D64-B18C-56242355A55D",
+    "dataURL" : "file:///Users/feiyu/Desktop/CodeTextClassifier/data/val_create_ml.csv",
+    "itemsCount" : 111560
+  },
+  "dataURL" : "file:///Users/feiyu/Desktop/CodeTextClassifier/data/val_create_ml.csv",
+  "experimentIDs" : [
+    "FA7B95E1-4163-479C-84B2-8569D73538F8",
+    "F40D3C91-B748-42F3-8E90-A8F5A3603AD8"
+  ],
+  "id" : "304F361C-734B-4D64-B18C-56242355A55D",
+  "modifiedDate" : "2026-06-25T09:33:28Z",
+  "pathType" : 0,
+  "preferredFilename" : "val_create_ml.csv",
+  "title" : "val_create_ml.csv",
+  "version" : "1.0"
+}
