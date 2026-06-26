@@ -10,6 +10,11 @@ This project collects real-world source code from 80+ popular open-source reposi
 
 The pipeline produces a **Core ML model** (`.mlmodel`) ready for integration into iOS, macOS, watchOS, or tvOS apps — no server round trip needed.
 
+The project ships **two classification tasks**:
+
+1. **Language Classification** — 23 languages, ~1.1M samples
+2. **CodeDetector** — binary `Code` / `PlainText` classifier (500k samples) that guards against feeding non-code text to the language classifier
+
 ## Supported Languages
 
 | Language | Samples | Language | Samples |
@@ -33,32 +38,28 @@ The pipeline produces a **Core ML model** (`.mlmodel`) ready for integration int
 
 ```
 CodeLaunguageClassifier/
-├── CodeLaunguageClassifier.mlproj/   # Create ML project (Xcode)
-│   ├── Project.json                   # Project configuration
-│   ├── Data Sources/                  # Linked CSV data sources
-│   ├── Model Containers/              # Training session tracking
-│   └── Models/Source1.mlmodel        # Trained Core ML model (3.3 MB)
-├── data/                              # Generated datasets (~617 MB)
-│   ├── train.jsonl                    # Training set (~878k samples)
-│   ├── val.jsonl                      # Validation set (~108k samples)
-│   ├── test.jsonl                     # Test set (~116k samples)
-│   ├── train/val/test_create_ml.csv   # Create ML compatible CSV
+├── data/                              # Generated datasets (gitignored, ~1 GB+)
+│   ├── train/val/test.jsonl           # 语言分类训练集（~878k / 108k / 116k）
+│   ├── train/val/test_create_ml.csv   # ↑ 对应的 Create ML CSV
+│   ├── code_detector_{train,validation,test}.jsonl   # CodeDetector 二分类（Code / PlainText）
+│   ├── code_detector_{train,validation,test}.json    # ↑ Create ML JSON 格式
+│   └── code_detector_summary.md       # CodeDetector 数据集统计与质量报告
 ├── scripts/                           # Data processing pipeline
 │   ├── download_repos.py              # Clone 80+ repos from GitHub for samples
-│   ├── prepare_data.py                # Main pipeline: scan → extract → clean → JSONL
+│   ├── prepare_data.py                # 语言分类主流水线: scan → extract → clean → JSONL
+│   ├── prepare_code_detector.py       # CodeDetector 二分类数据集生成
 │   ├── verify_data.py                 # Validate JSONL integrity & distributions
 │   ├── export_csv.py                  # JSONL → generic CSV
 │   ├── export_create_ml_csv.py        # JSONL → Create ML CSV
+│   ├── export_code_detector_csv.py    # CodeDetector JSONL → Create ML CSV
+│   ├── export_create_ml_json.py       # JSONL → Create ML JSON array
 │   ├── export_json.py                 # JSONL → JSON array
 │   ├── export_test_csv.py             # test.jsonl → Create ML CSV
 │   ├── downsample_train.py            # Balance classes via downsampling
 │   └── extract_swiftui_samples.py     # Extra Swift samples from SwiftUI projects
-├── repos/                             # Cloned source repositories (~3.3 GB)
-│   ├── linguist/                      # GitHub Linguist samples
-│   ├── Swift/  C/  C++/  Python/ …   # Open-source repos per language
-├── findings.md                        # Research notes & technical decisions
-├── task_plan.md                       # Task plan & completion tracking
-└── progress.md                        # Session progress log
+└── repos/                             # Cloned source repositories (~3.3 GB, gitignored)
+    ├── linguist/                      # GitHub Linguist samples
+    └── Swift/  C/  C++/  Python/ …   # Open-source repos per language
 ```
 
 ## Pipeline
@@ -99,7 +100,7 @@ Cloned repos (.swift, .py, .java, ...)
 ### Prerequisites
 
 - **macOS** (for Create ML / Core ML training)
-- **Xcode** (to open the `.mlproj` project)
+- **Xcode** (to train models with Create ML)
 - **Python 3.14+** (for data processing scripts)
 - **Git** (for cloning source repositories)
 
@@ -158,11 +159,10 @@ python3 scripts/downsample_train.py -n 20000
 
 ### Training the Model
 
-1. Open `CodeLaunguageClassifier.mlproj` in Xcode
-2. The data sources (`train_create_ml.csv`, `val_create_ml.csv`, `test_create_ml.csv`) are already linked
-3. Select the **Text Classifier** template
-4. Start training in Create ML
-5. The trained `.mlmodel` is exported to `Models/Source1.mlmodel`
+1. Create a new **Create ML** project in Xcode (Text Classifier template)
+2. Import data sources from `data/` — `*_create_ml.csv` for language classification, or `code_detector_*.csv` / `code_detector_*.json` for CodeDetector
+3. Start training in Create ML
+4. Export the trained `.mlmodel` for use in your app
 
 ### Using the Model
 
@@ -182,10 +182,13 @@ let language = model.predictedLabel(for: "func hello() -> String { return \"worl
 | Script | Purpose |
 |--------|---------|
 | `download_repos.py` | Clones all 80+ open-source repositories from GitHub for code samples |
-| `prepare_data.py` | Main pipeline — scans repos, extracts samples, strips comments, outputs JSONL |
+| `prepare_data.py` | 语言分类主流水线 — scans repos, extracts samples, strips comments, outputs JSONL |
+| `prepare_code_detector.py` | 生成 CodeDetector 二分类数据集（Code / PlainText） |
 | `verify_data.py` | Checks JSONL format integrity, label distribution, path leakage, length stats |
 | `export_csv.py` | Converts JSONL to generic CSV (`\n` encoded inside text) |
-| `export_create_ml_csv.py` | Converts JSONL to Create ML CSV (newlines → spaces, escapes cleaned) |
+| `export_create_ml_csv.py` | Converts JSONL to Create ML CSV (字段内换行 → 空格，其余按 RFC 4180 转义) |
+| `export_code_detector_csv.py` | Converts CodeDetector JSONL to Create ML CSV（与上同格式） |
+| `export_create_ml_json.py` | Converts JSONL to Create ML JSON array（完整保留换行与特殊字符） |
 | `export_json.py` | Converts JSONL to a JSON array |
 | `export_test_csv.py` | Converts only `test.jsonl` to Create ML CSV |
 | `downsample_train.py` | Downsamples training set to N samples per language for balanced classes |
@@ -206,7 +209,7 @@ Code samples are collected from **80+ well-known open-source projects** includin
 - **C:** git/git, redis/redis
 - **And more:** rails/ruby-on-rails, JetBrains/kotlin, ohmyzsh/ohmyzsh, laravel/laravel
 
-See `findings.md` for the complete list and sourcing strategy.
+See `scripts/download_repos.py` for the complete repository list.
 
 ## Trained Model
 
@@ -218,11 +221,11 @@ Two model versions were trained:
 | v2 (23-class, full) | 23 | 878,264 | — | — |
 | **v3 (23-class, balanced)** | **23** | **480,000** | **10** | **3.3 MB** |
 
-The final `Source1.mlmodel` uses the balanced 23-class dataset (20k samples per language for 23 languages), trained for 10 iterations in Create ML.
+The final model uses the balanced 23-class dataset (20k samples per language for 23 languages), trained for 10 iterations in Create ML. The `.mlmodel` is not tracked in this repository — retrain it via the pipeline above.
 
 ## License
 
-This project is for educational purposes. The source code samples collected from open-source repositories retain their original licenses. The pipeline scripts are MIT-licensed (see `LICENSE` if present).
+This project is for educational purposes. The source code samples collected from open-source repositories retain their original licenses. The pipeline scripts are MIT-licensed.
 
 ## See Also
 
