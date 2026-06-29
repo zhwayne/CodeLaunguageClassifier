@@ -12,7 +12,7 @@ import os
 import re
 from pathlib import Path
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "code_detector"
 
 FILES = [
     ("code_detector_train.jsonl", "code_detector_train.csv"),

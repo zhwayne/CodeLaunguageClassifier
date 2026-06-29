@@ -39,24 +39,30 @@ The project ships **two classification tasks**:
 ```
 CodeLaunguageClassifier/
 ├── data/                              # Generated datasets (gitignored, ~1 GB+)
-│   ├── train/val/test.jsonl           # 语言分类训练集（~878k / 108k / 116k）
-│   ├── train/val/test_create_ml.csv   # ↑ 对应的 Create ML CSV
-│   ├── code_detector_{train,validation,test}.jsonl   # CodeDetector 二分类（Code / PlainText）
-│   ├── code_detector_{train,validation,test}.json    # ↑ Create ML JSON 格式
-│   └── code_detector_summary.md       # CodeDetector 数据集统计与质量报告
-├── scripts/                           # Data processing pipeline
-│   ├── download_repos.py              # Clone 80+ repos from GitHub for samples
-│   ├── prepare_data.py                # 语言分类主流水线: scan → extract → clean → JSONL
-│   ├── prepare_code_detector.py       # CodeDetector 二分类数据集生成
-│   ├── verify_data.py                 # Validate JSONL integrity & distributions
-│   ├── export_csv.py                  # JSONL → generic CSV
-│   ├── export_create_ml_csv.py        # JSONL → Create ML CSV
-│   ├── export_code_detector_csv.py    # CodeDetector JSONL → Create ML CSV
-│   ├── export_create_ml_json.py       # JSONL → Create ML JSON array
-│   ├── export_json.py                 # JSONL → JSON array
-│   ├── export_test_csv.py             # test.jsonl → Create ML CSV
-│   ├── downsample_train.py            # Balance classes via downsampling
-│   └── extract_swiftui_samples.py     # Extra Swift samples from SwiftUI projects
+│   ├── lang_classifier/               # 语言分类（23 类）
+│   │   ├── train/val/test.jsonl       # ~878k / 108k / 116k samples
+│   │   ├── train/val/test_create_ml.csv
+│   │   └── test_mini.csv, test_small.csv
+│   └── code_detector/                 # CodeDetector 二分类（Code / PlainText）
+│       ├── code_detector_{train,validation,test}.jsonl
+│       ├── code_detector_{train,validation,test}.json
+│       └── code_detector_summary.md
+├── scripts/
+│   ├── lang_classifier/               # 语言分类流水线
+│   │   ├── prepare_data.py            # Main: scan → extract → clean → JSONL
+│   │   ├── extract_swiftui_samples.py # Extra Swift samples from SwiftUI projects
+│   │   ├── downsample_train.py        # Balance classes via downsampling
+│   │   ├── verify_data.py             # Validate JSONL integrity & distributions
+│   │   ├── export_csv.py              # JSONL → generic CSV
+│   │   ├── export_json.py             # JSONL → JSON array
+│   │   └── export_test_csv.py         # test.jsonl → Create ML CSV
+│   ├── code_detector/                 # CodeDetector 二分类
+│   │   ├── prepare_code_detector.py   # 数据集生成（Code / PlainText）
+│   │   ├── export_create_ml_csv.py    # JSONL → Create ML CSV
+│   │   ├── export_code_detector_csv.py# CodeDetector JSONL → Create ML CSV
+│   │   └── export_create_ml_json.py   # JSONL → Create ML JSON array
+│   └── common/                        # 共用工具
+│       └── download_repos.py          # Clone 80+ repos from GitHub for samples
 └── repos/                             # Cloned source repositories (~3.3 GB, gitignored)
     ├── linguist/                      # GitHub Linguist samples
     └── Swift/  C/  C++/  Python/ …   # Open-source repos per language
@@ -110,20 +116,20 @@ The model is trained on real-world code from 80+ well-known open-source projects
 
 ```bash
 # Download all repositories (this will take a while — ~3.3 GB total)
-python3 scripts/download_repos.py
+python3 scripts/common/download_repos.py
 
 # Download only specific languages
-python3 scripts/download_repos.py --lang Swift
-python3 scripts/download_repos.py --lang Python --lang Go
+python3 scripts/common/download_repos.py --lang Swift
+python3 scripts/common/download_repos.py --lang Python --lang Go
 
 # Download with more parallel workers (default: 4)
-python3 scripts/download_repos.py -j 8
+python3 scripts/common/download_repos.py -j 8
 
 # Skip GitHub Linguist (already have it or want to save bandwidth)
-python3 scripts/download_repos.py --skip-linguist
+python3 scripts/common/download_repos.py --skip-linguist
 
 # Full clone (with git history) instead of shallow depth=1
-python3 scripts/download_repos.py --full
+python3 scripts/common/download_repos.py --full
 ```
 
 The script skips any repository that has already been cloned, so you can safely re-run it to resume interrupted downloads.
@@ -132,29 +138,29 @@ The script skips any repository that has already been cloned, so you can safely 
 
 ```bash
 # Process all 23 languages (up to 50k samples per language)
-python3 scripts/prepare_data.py
+python3 scripts/lang_classifier/prepare_data.py
 
 # Process only one language
-python3 scripts/prepare_data.py --lang Swift
+python3 scripts/lang_classifier/prepare_data.py --lang Swift
 
 # Specify output directory
-python3 scripts/prepare_data.py --output /path/to/data
+python3 scripts/lang_classifier/prepare_data.py --output /path/to/data
 
 # Limit samples per language
-python3 scripts/prepare_data.py -n 20000
+python3 scripts/lang_classifier/prepare_data.py -n 20000
 ```
 
 ### Verification & Export
 
 ```bash
 # Validate JSONL format, labels, and distributions
-python3 scripts/verify_data.py
+python3 scripts/lang_classifier/verify_data.py
 
 # Export to Create ML CSV (for training in Xcode)
-python3 scripts/export_create_ml_csv.py
+python3 scripts/code_detector/export_create_ml_csv.py
 
 # Downsample training set for balanced class distribution
-python3 scripts/downsample_train.py -n 20000
+python3 scripts/lang_classifier/downsample_train.py -n 20000
 ```
 
 ### Training the Model
@@ -179,20 +185,32 @@ let language = model.predictedLabel(for: "func hello() -> String { return \"worl
 
 ## Script Reference
 
+### `scripts/lang_classifier/` — 语言分类（23 类）
+
 | Script | Purpose |
 |--------|---------|
-| `download_repos.py` | Clones all 80+ open-source repositories from GitHub for code samples |
-| `prepare_data.py` | 语言分类主流水线 — scans repos, extracts samples, strips comments, outputs JSONL |
-| `prepare_code_detector.py` | 生成 CodeDetector 二分类数据集（Code / PlainText） |
+| `prepare_data.py` | 主流水线 — scans repos, extracts samples, strips comments, outputs JSONL |
+| `extract_swiftui_samples.py` | Extracts extra Swift samples from SwiftUI projects |
+| `downsample_train.py` | Downsamples training set to N samples per language for balanced classes |
 | `verify_data.py` | Checks JSONL format integrity, label distribution, path leakage, length stats |
 | `export_csv.py` | Converts JSONL to generic CSV (`\n` encoded inside text) |
+| `export_json.py` | Converts JSONL to a JSON array |
+| `export_test_csv.py` | Converts only `test.jsonl` to Create ML CSV |
+
+### `scripts/code_detector/` — CodeDetector 二分类
+
+| Script | Purpose |
+|--------|---------|
+| `prepare_code_detector.py` | 生成 CodeDetector 二分类数据集（Code / PlainText） |
 | `export_create_ml_csv.py` | Converts JSONL to Create ML CSV (字段内换行 → 空格，其余按 RFC 4180 转义) |
 | `export_code_detector_csv.py` | Converts CodeDetector JSONL to Create ML CSV（与上同格式） |
 | `export_create_ml_json.py` | Converts JSONL to Create ML JSON array（完整保留换行与特殊字符） |
-| `export_json.py` | Converts JSONL to a JSON array |
-| `export_test_csv.py` | Converts only `test.jsonl` to Create ML CSV |
-| `downsample_train.py` | Downsamples training set to N samples per language for balanced classes |
-| `extract_swiftui_samples.py` | Extracts extra Swift samples from SwiftUI projects |
+
+### `scripts/common/` — 共用工具
+
+| Script | Purpose |
+|--------|---------|
+| `download_repos.py` | Clones all 80+ open-source repositories from GitHub for code samples |
 
 ## Source Repositories
 
@@ -209,7 +227,7 @@ Code samples are collected from **80+ well-known open-source projects** includin
 - **C:** git/git, redis/redis
 - **And more:** rails/ruby-on-rails, JetBrains/kotlin, ohmyzsh/ohmyzsh, laravel/laravel
 
-See `scripts/download_repos.py` for the complete repository list.
+See `scripts/common/download_repos.py` for the complete repository list.
 
 ## Trained Model
 

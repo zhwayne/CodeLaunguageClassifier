@@ -16,9 +16,9 @@ from collections import defaultdict
 from pathlib import Path
 
 # ── 配置 ────────────────────────────────────────────────────
-DATA_DIR = "/Users/feiyu/Desktop/CodeTextClassifier/data"
+DATA_DIR = str(Path(__file__).resolve().parent.parent.parent / "data" / "lang_classifier")
 TRAIN_CSV = os.path.join(DATA_DIR, "train_create_ml.csv")
-REPOS_BASE = "/Users/feiyu/Desktop/CodeTextClassifier/repos/Swift"
+REPOS_BASE = str(Path(__file__).resolve().parent.parent.parent / "repos" / "Swift")
 
 # 只处理新增的 SwiftUI 项目（不包含已有 repos）
 SWIFTUI_REPOS = [

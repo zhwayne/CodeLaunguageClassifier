@@ -6,7 +6,7 @@ export_test_csv.py — 只将 test.jsonl 转换为 test_create_ml.csv
 
 import json, os, re
 
-data_dir = '/Users/feiyu/Desktop/CodeTextClassifier/data'
+data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "lang_classifier"))
 
 src = os.path.join(data_dir, 'test.jsonl')
 dst = os.path.join(data_dir, 'test_create_ml.csv')

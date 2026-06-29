@@ -10,7 +10,7 @@ JSON 原生支持字段内换行与特殊字符，无需对文本做任何替换
 import json
 import os
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'data', 'code_detector')
 
 # 源 JSONL → 目标 JSON
 SOURCES = [

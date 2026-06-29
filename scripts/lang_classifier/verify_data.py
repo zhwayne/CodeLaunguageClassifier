@@ -3,7 +3,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
-data_dir = Path(__file__).resolve().parent.parent / "data"
+data_dir = Path(__file__).resolve().parent.parent.parent / "data" / "lang_classifier"
 
 for fname in ["train.jsonl", "val.jsonl", "test.jsonl"]:
     path = data_dir / fname

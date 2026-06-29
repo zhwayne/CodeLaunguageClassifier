@@ -1,6 +1,6 @@
 import json, csv, os
 
-data_dir = '/Users/feiyu/Desktop/CodeTextClassifier/data'
+data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "lang_classifier"))
 
 NL_ESCAPED = chr(92) + 'n'  # literal \n (2 chars)
 

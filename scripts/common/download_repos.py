@@ -329,8 +329,8 @@ def main():
     )
     args = parser.parse_args()
 
-    # 确定项目根目录 (scripts/../repos)
-    repos_base = str(Path(__file__).resolve().parent.parent / "repos")
+    # 确定项目根目录 (scripts/common/../../repos)
+    repos_base = str(Path(__file__).resolve().parent.parent.parent / "repos")
     os.makedirs(repos_base, exist_ok=True)
 
     print("=" * 60)

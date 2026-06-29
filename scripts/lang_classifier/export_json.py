@@ -1,6 +1,6 @@
 import json, os
 
-data_dir = '/Users/feiyu/Desktop/CodeTextClassifier/data'
+data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "lang_classifier"))
 
 for fname in ['train.jsonl', 'val.jsonl', 'test.jsonl']:
     src = f'{data_dir}/{fname}'

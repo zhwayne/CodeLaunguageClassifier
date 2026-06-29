@@ -462,7 +462,7 @@ def scan_source_files(src_dirs: list[str], extensions: set) -> list[str]:
 
 def scan_all_repos(extensions: set) -> list[str]:
     """扫描所有已克隆的 repo，收集指定扩展名的文件。"""
-    repos_base = Path(__file__).resolve().parent.parent / "repos"
+    repos_base = Path(__file__).resolve().parent.parent.parent / "repos"
     files = []
     for repo_dir in repos_base.iterdir():
         if not repo_dir.is_dir() or repo_dir.name == "linguist":
@@ -497,14 +497,14 @@ def scan_all_repos(extensions: set) -> list[str]:
 def main():
     parser = argparse.ArgumentParser(description="编程语言识别训练数据准备")
     parser.add_argument("--lang", "-l", help="只处理指定语言")
-    parser.add_argument("--output", "-o", default="data", help="输出目录")
+    parser.add_argument("--output", "-o", default="data/lang_classifier", help="输出目录")
     parser.add_argument("--samples-per-lang", "-n", type=int, default=50000,
                         help="每种语言目标样本数 (默认: 50000)")
     parser.add_argument("--seed", type=int, default=42, help="随机种子")
     args = parser.parse_args()
 
     random.seed(args.seed)
-    base_dir = Path(__file__).resolve().parent.parent
+    base_dir = Path(__file__).resolve().parent.parent.parent
     output_dir = base_dir / args.output
     output_dir.mkdir(parents=True, exist_ok=True)
 

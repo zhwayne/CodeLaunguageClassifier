@@ -12,7 +12,7 @@ import random
 import argparse
 from collections import defaultdict
 
-DATA_DIR = "/Users/feiyu/Desktop/CodeTextClassifier/data"
+DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "lang_classifier"))
 TRAIN_CSV = os.path.join(DATA_DIR, "train_create_ml.csv")
 OUTPUT_CSV = os.path.join(DATA_DIR, "train_create_ml.csv")  # 原地覆盖
 

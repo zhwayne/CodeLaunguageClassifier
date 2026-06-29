@@ -45,9 +45,9 @@ TRAIN_RATIO = 0.8
 VAL_RATIO = 0.1
 TEST_RATIO = 0.1
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
-OUTPUT_DIR = Path(__file__).resolve().parent.parent / "data"
-REPOS_DIR = Path(__file__).resolve().parent.parent / "repos"
+DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "lang_classifier"
+OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "code_detector"
+REPOS_DIR = Path(__file__).resolve().parent.parent.parent / "repos"
 
 
 # ── 从 repos/ 提取真实 PlainText ─────────────────────────────
@@ -1181,9 +1181,9 @@ def main():
     parser.add_argument("--plain-samples", type=int, default=DEFAULT_PLAIN_SAMPLES,
                         help=f"PlainText 样本数 (默认: {DEFAULT_PLAIN_SAMPLES})")
     parser.add_argument("--data-dir", type=str, default=str(DATA_DIR),
-                        help="数据目录 (默认: data/)")
+                        help="数据目录 (默认: data/lang_classifier/)")
     parser.add_argument("--output-dir", type=str, default=str(OUTPUT_DIR),
-                        help="输出目录 (默认: data/)")
+                        help="输出目录 (默认: data/code_detector/)")
     parser.add_argument("--seed", type=int, default=SEED,
                         help=f"随机种子 (默认: {SEED})")
     args = parser.parse_args()

@@ -12,7 +12,7 @@ import csv
 import json
 import os
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'data', 'code_detector')
 
 # 源 JSONL → 目标 CSV
 SOURCES = [
